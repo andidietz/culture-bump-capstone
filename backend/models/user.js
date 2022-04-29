@@ -68,7 +68,9 @@ class User {
 
     static async getAllReferencePoints(username) {
         const results = await db.query(
-            `SELECT r.story, 
+            `SELECT r.type,
+                r.sparker,
+                r.thought, 
                 r.observation, 
                 r.response,
                 r.emotions, 
@@ -76,9 +78,9 @@ class User {
                 r.action,
                 r.qualities,
                 r.connection_point,
-                username, 
-                sit.headerSituation, 
-                spec.headerSpecification, 
+                r.user_id, 
+                sit.header_situation, 
+                spec.header_specification, 
                 c.category, 
                 sub.subcategory
             FROM reference_points AS r
@@ -86,11 +88,11 @@ class User {
                     ON sit.id = r.header_situation_id
                 JOIN header_specifications AS spec 
                     ON spec.id = r.header_specification_id
-                JOIN category AS c 
+                JOIN categories AS c 
                     ON c.id = r.category_id
-                JOIN subcategory AS sub 
+                JOIN subcategories AS sub 
                     ON sub.id = r.subcategory_id
-            WHERE username = $1`, [username]
+            WHERE r.user_id = $1`, [username]
         )
 
         const userReferencePoints = results.rows

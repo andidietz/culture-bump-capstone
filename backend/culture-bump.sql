@@ -1,7 +1,7 @@
 \echo
 \prompt 'Return for yes or control-C to cancel > ' foo
 
-DROP DATABASE culture_bump
+-- DROP DATABASE culture_bump
 \connect culture_bump
 
 \i culture-bump-schema.sql

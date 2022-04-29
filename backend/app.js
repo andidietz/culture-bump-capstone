@@ -2,17 +2,18 @@ const express = require('express')
 const cors = require('cors')
 const ExpressError = require('./expressError')
 
-const directoryRoutes = require('./routes/directory')
-const eightStepsRoutes = require('./routes/eightSteps')
-const userRoutes = require('./models/user')
+// const directoryRoutes = require('./routes/directory')
+// const eightStepsRoutes = require('./routes/eightSteps')
+const referencPointsRoutes = require('./routes/referencePoints')
+const userRoutes = require('./routes/user')
 
 const app = express()
 app.use(cors())
 app.use(express.json())
 
 
-app.use('/directory', directoryRoutes)
-app.use('/eight-steps', eightStepsRoutes)
+app.use('/directory', referencPointsRoutes)
+app.use('/eight-steps', referencPointsRoutes)
 app.use('/users', userRoutes)
 
 app.get('/', function(req, res) {

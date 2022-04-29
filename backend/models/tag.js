@@ -2,11 +2,11 @@ const db = require('../db')
 const ExpressError = require('../expressError')
 
 class Tag {
-    static async create({tag}) {
+    static async create({tagId}) {
         const results = await db.query(
             `INSERT INTO tags (tag)   
             VALUES ($1)
-            RETURNING tag`, [tag])
+            RETURNING tag`, [tagId])
 
         const tag = results.rows[0]
         return tag
@@ -22,12 +22,12 @@ class Tag {
         return tag
     }
 
-    static async update(id, tag) {
+    static async update(id, tagId) {
         const results = await db.query(
             `UPDATE tags
             SET tag = $2
             WHERE id = $1
-            RETURNING tag`, [id, tag])
+            RETURNING tag`, [id, tagId])
 
         const tag = results.rows[0]
         return tag

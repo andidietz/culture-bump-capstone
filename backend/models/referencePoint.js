@@ -1,8 +1,12 @@
 const db = require('../db')
 const ExpressError = require('../expressError')
 
+const Tag = require('./tag')
+
 class ReferencePoint {
-    static async create({story, 
+    static async create({type,
+        sparker,
+        thought,
         observation, 
         response,
         emotions, 
@@ -13,10 +17,12 @@ class ReferencePoint {
         username}) {
             const results = await db.query(
                 `INSERT INTO reference_points
-                (story, observation, emotions, universal, action,
-                    qualities,connection_point,user_id)
+                (type, sparker, thought, observation, emotions, universal,
+                    action, qualities, connection_point, user_id)
                 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
-                RETURNING story, 
+                RETURNING type, 
+                    sparker, 
+                    thought, 
                     observation, 
                     response,
                     emotions, 
@@ -26,7 +32,9 @@ class ReferencePoint {
                     connection_point,
                     username`,
                 [
-                    story, 
+                    type, 
+                    sparker, 
+                    thought, 
                     observation, 
                     response,
                     emotions, 
@@ -40,11 +48,81 @@ class ReferencePoint {
             const referencePoint = results.rows[0]
             return referencePoint
         }
+    
+        static async getAll() {
+            const results = await db.query(
+                `SELECT type, 
+                    sparker, 
+                    thought, 
+                    observation, 
+                    response,
+                    emotions, 
+                    universal,
+                    action,
+                    qualities,
+                    connection_point,
+                    user_id
+                FROM reference_points`)
+    
+            const referencePoint = results.rows
+            return referencePoint
+        }
 
+        static async getAll(filters = {}) {
+            let query = `SELECT r.type,
+                r.sparker,
+                r.thought, 
+                r.observation, 
+                r.response,
+                r.emotions, 
+                r.universal,
+                r.action,
+                r.qualities,
+                r.connection_point,
+                r.user_id, 
+                sit.header_situation, 
+                spec.header_specification, 
+                c.category, 
+                sub.subcategory
+            FROM reference_points AS r
+                JOIN header_situations AS sit 
+                    ON sit.id = r.header_situation_id
+                JOIN header_specifications AS spec 
+                    ON spec.id = r.header_specification_id
+                JOIN categories AS c 
+                    ON c.id = r.category_id
+                JOIN subcategories AS sub 
+                    ON sub.id = r.subcategory_id`
+            let whereStatement = []
+            let values = []
 
+            const {tag} = filters
+    
+            if (tag) {
+                values.push(tag)
+                console.log('values', values)
+                whereStatement.push(`
+                    JOIN tags_reference_points AS tp 
+                        ON r.id = tp.reference_point_id
+                    JOIN tags AS t 
+                        ON tp.tag_id = t.id 
+                    WHERE t.id = $1
+                `)
+                query += whereStatement
+                console.log(query)
+            }
+            
+            
+            const referencePoint = await db.query(query, values)
+            return referencePoint.rows
+        }
+
+        
     static async get(id) {
         const results = await db.query(
-            `SELECT story, 
+            `SELECT type, 
+                sparker, 
+                thought, 
                 observation, 
                 response,
                 emotions, 
@@ -81,7 +159,9 @@ class ReferencePoint {
                 JOIN subcategory AS sub 
                     ON sub.id = r.subcategory_id
             WHERE id = $1
-            RETURNING story, 
+            RETURNING type, 
+                sparker, 
+                thought, 
                 observation, 
                 response,
                 emotions, 

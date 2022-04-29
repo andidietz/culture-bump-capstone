@@ -1,38 +1,40 @@
--- CREATE TABLE users (
---     username VARCHAR(25) PRIMARY KEY,
---     name TEXT NOT NULL,
---     password TEXT NOT NULL,
---     email TEXT NOT NULL CHECK (position('@' IN email) > 1)
--- );
+CREATE TABLE users (
+    username VARCHAR(25) PRIMARY KEY,
+    name TEXT NOT NULL,
+    password TEXT NOT NULL,
+    email TEXT NOT NULL CHECK (position('@' IN email) > 1)
+);
 
--- CREATE TABLE tags (
---     id SERIAL PRIMARY KEY,
---     tag TEXT NOT NULL
--- );
+CREATE TABLE tags (
+    id SERIAL PRIMARY KEY,
+    tag TEXT NOT NULL
+);
 
--- CREATE TABLE header_situations (
---     id SERIAL PRIMARY KEY,
---     header_situation TEXT NOT NULL
--- );
+CREATE TABLE header_situations (
+    id SERIAL PRIMARY KEY,
+    header_situation TEXT NOT NULL
+);
 
--- CREATE TABLE header_specifications (
---     id SERIAL PRIMARY KEY,
---     header_specification TEXT NOT NULL
--- );
+CREATE TABLE header_specifications (
+    id SERIAL PRIMARY KEY,
+    header_specification TEXT NOT NULL
+);
 
--- CREATE TABLE categories (
---     id SERIAL PRIMARY KEY,
---     category TEXT NOT NULL
--- );
+CREATE TABLE categories (
+    id SERIAL PRIMARY KEY,
+    category TEXT NOT NULL
+);
 
--- CREATE TABLE subcategories (
---     id SERIAL PRIMARY KEY,
---     subcategory TEXT NOT NULL
--- );
+CREATE TABLE subcategories (
+    id SERIAL PRIMARY KEY,
+    subcategory TEXT NOT NULL
+);
 
 CREATE TABLE reference_points (
     id SERIAL PRIMARY KEY,
-    story TEXT NOT NULL,
+    type TEXT NOT NULL,
+    sparker TEXT NOT NULL,
+    thought TEXT NOT NULL,
     observation TEXT NOT NULL,
     response TEXT NOT NULL,
     emotions TEXT NOT NULL,
@@ -48,15 +50,15 @@ CREATE TABLE reference_points (
         REFERENCES header_specifications ON DELETE CASCADE,
     category_id INTEGER
         REFERENCES categories ON DELETE CASCADE,
-    subcatergory_id INTEGER  
+    subcategory_id INTEGER  
         REFERENCES subcategories ON DELETE CASCADE   
 );
 
 CREATE TABLE bookmarks (
     id SERIAL PRIMARY KEY,
-    users_id TEXT
+    user_id TEXT
         REFERENCES users ON DELETE CASCADE,
-    reference_points_id INTEGER
+    reference_point_id INTEGER
         REFERENCES reference_points ON DELETE CASCADE,
     is_header_tag BOOLEAN
 );
@@ -65,14 +67,14 @@ CREATE TABLE tags_reference_points (
     id SERIAL PRIMARY KEY,
     tag_id INTEGER
         REFERENCES tags ON DELETE CASCADE,
-    reference_points_id INTEGER
+    reference_point_id INTEGER
         REFERENCES reference_points ON DELETE CASCADE
 );
 
--- CREATE TABLE users_tags (
---     id SERIAL PRIMARY KEY,
---     users_id TEXT
---         REFERENCES users ON DELETE CASCADE,
---     tag_id INTEGER
---         REFERENCES tags ON DELETE CASCADE   
--- );
+CREATE TABLE users_tags (
+    id SERIAL PRIMARY KEY,
+    user_id TEXT
+        REFERENCES users ON DELETE CASCADE,
+    tag_id INTEGER
+        REFERENCES tags ON DELETE CASCADE   
+);

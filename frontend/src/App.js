@@ -1,26 +1,104 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, {useState, useEfect, useEffect} from 'react'
+import {BrowserRouter} from 'react-router-dom'
+import jwt from 'jsonwebtoken'
+
+import Routes from './nav/Routes'
+import CultureBumpApi from '../api'
+import UserContext from './auth/UserConext'
+import RefContext from './context/RefContext'
+import Nav from './nav/Nav'
+import useLocalStorage from './hooks/useLocalStorage'
+
+import './App.css'
+
+const TOKEN_IN_STORAGE = "Storage-Token"
 
 function App() {
+  const [infoIsLoaded, setInfoIsLoaded] = useState(false)
+  const [currentUser, setCurrentUser] = useState(null)
+  const [token, setToken] = useLocalStorage(TOKEN_IN_STORAGE)
+  const [userBumps, setUserBumps] = useState([])
+  const [userTags, setUserTags] = useState([])
+  const [refPoint, setRefPoint] = useState({
+    id,
+    headerSituation, 
+    headerSpecification, 
+    tag, 
+    action,
+    qualities
+  })
+
+  useEffect(function loadUserInfo() {
+    async function getCurrentUser() {
+      if (token) {
+        try {
+          const {username} = jwt.decode(token)
+          CultureBumpApi.token = token
+          const currentUser = await CultureBumpApi.getCurrentUser(username)
+          const userBumps = await CultureBumpApi...(username)
+          const userTags = await CultureBumpApi...(username)
+          setCurrentUser(currentUser)
+          setUserBumps(userBumps)
+        } catch (err) {
+          setCurrentUser(null)
+        }
+      }
+      setInfoIsLoaded(true)
+    }
+    setInfoIsLoaded(false)
+    getCurrentUser()
+  }, [token])
+
+  const logout = () => {
+    setCurrentUser(null)
+    setToken(null)
+  }
+
+  async function login(loginData) {
+    try {
+      const token = await CultureBumpApi.login(loginData) 
+      setToken(token)
+      return {sucess: true}
+    } catch (err) {
+      return {success: false, err}
+    }
+  }
+
+  async function signup(signupData) {
+    try {
+      const token = await CultureBumpApi.signup(signupData)
+      setToken(token)
+      return {sucess: true}
+    } catch (err) {
+      return {sucess : false, err}
+    }
+  }
+
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+    <BrowserRouter>
+      <UserContext.Provider values={{
+        currentUser, 
+        setCurrentUser, 
+        userBumps, 
+        setUserBumps,
+        userTags, 
+        setUserTags
+      }}>
+        <RefContext.Provider values={{
+          currentUser, 
+          setCurrentUser, 
+          refPoint, 
+          setRefPoint
+        }}>
+          <div>
+            <Nav logout={logout}/>
+            <Routes login={login} signup={signup} />
+          </div>
+        </RefContext.Provider>
+      </UserContext.Provider>
+    </BrowserRouter>
+  )
 }
 
-export default App;
+export default App

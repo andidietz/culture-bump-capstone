@@ -11,7 +11,7 @@ const stepsToolAddSchema = require('../schemas/stepsToolAdd.json')
 // Eight Step Tool is a form that intakes the basic information
 //    that makes up a reference point.
 
-router.post('/', async function (req,res, next) {
+router.post('/', async function (req, res, next) {
     try {
         const validator = jsonschema.validate(re.body, stepsToolAddSchema)
         if (!validator.valid) {

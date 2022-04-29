@@ -12,14 +12,15 @@ class Bookmark {
         return bookmark
     }
 
-    static async get({username}) {
+    static async get(username) {
+        console.log('username', username)
         const results = await db.query(
             `SELECT r.universal, 
                 r.action, 
                 r.qualities,
-                username, 
-                sit.headerSituation, 
-                spec.headerSpecification, 
+                r.user_id, 
+                sit.header_situation, 
+                spec.header_specification, 
                 c.category, 
                 sub.subcategory
             FROM reference_points AS r
@@ -27,11 +28,11 @@ class Bookmark {
                     ON sit.id = r.header_situation_id
                 JOIN header_specifications AS spec 
                     ON spec.id = r.header_specification_id
-                JOIN category AS c 
+                JOIN categories AS c 
                     ON c.id = r.category_id
-                JOIN subcategory AS sub 
+                JOIN subcategories AS sub 
                     ON sub.id = r.subcategory_id
-            WHERE username = $1`, [username]
+            WHERE r.user_id = $1`, [username]
         )
 
         const bookmarks = results.rows
